@@ -59,3 +59,58 @@ from (
     where first_name = 'JESSIE'
      )
 as cust;
+
+drop table if exists actors_j;
+create temporary table actors_j
+(
+    actor_id smallint(5),
+    first_name varchar(45),
+    last_name varchar(45),
+    constraint pk_actor_id
+        primary key (actor_id)
+);
+describe actors_j;
+
+insert into  actors_j
+    select actor_id, first_name, last_name
+    from actor
+    where last_name like 'J%';
+# %를 사용하여 필터링 가능함
+#  이름이 J로 시작하는 사람을 조회
+
+select *
+from actors_j;
+
+DROP VIEW if exists cust_vw;
+CREATE VIEW cust_vw as
+    select customer.customer_id, customer.first_name, customer.last_name, customer.active
+    from customer;
+
+
+select *
+from cust_vw;
+
+# Join 을 활용하여 테이블을 ON에 명시된 조건에 의해서 효율적으로 결합가능
+select customer.first_name, customer.last_name,
+    time(rental.rental_date) as rental_time
+from customer inner join rental
+    on customer.customer_id = rental.customer_id #join 조건을 의미함
+where date(rental_date) = '2005-06-14';
+
+# 위 구문을 축약어로 대체하여 사용 가능
+select c.first_name, c.last_name,
+    time(r.rental_date) as rental_time
+from customer as c inner join rental as r
+    on c.customer_id = r.customer_id
+where date(r.rental_date) = '2005-06-14';
+
+# G rating 렌탈기간 7 이상
+select film.title
+from film
+where rating = 'G' and rental_duration >= 7;
+
+# 복수조건 사용하기
+select title, rating, rental_duration
+from film f
+where (f.rating = 'G' and f.rental_duration >= 7)
+   or (f.rating = 'PG-13' and f.rental_duration < 4);

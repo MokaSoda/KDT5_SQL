@@ -1,1 +1,0 @@
-## KDT Project SQL Learning
